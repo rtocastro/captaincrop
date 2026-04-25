@@ -13,6 +13,8 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebase";
+import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { auth } from "./firebase";
 
 const starterPledges = [
   {
@@ -40,10 +42,9 @@ const formatDate = (ts) => {
 };
 
 function App() {
-  const [pledges, setPledges] = useState(() => {
-    const saved = localStorage.getItem("powerplant-pledges");
-    return saved ? JSON.parse(saved) : starterPledges;
-  });
+  const [pledges, setPledges] = useState([]);
+
+  const [user, setUser] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -56,18 +57,66 @@ function App() {
   });
 
 useEffect(() => {
-  const q = query(collection(db, "pledges"), orderBy("createdAt", "desc"));
-
-  const unsubscribe = onSnapshot(q, (snapshot) => {
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setPledges(data);
+  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    if (currentUser) {
+      setUser(currentUser);
+      console.log("Auth state user:", currentUser.uid);
+    } else {
+      try {
+        const result = await signInAnonymously(auth);
+        setUser(result.user);
+        console.log("Signed in anonymously:", result.user.uid);
+      } catch (error) {
+        console.error("Auth error:", error);
+      }
+    }
   });
 
-  return () => unsubscribe(); // cleanup
+  return () => unsubscribe();
 }, []);
+
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    if (currentUser) {
+      setUser(currentUser);
+      console.log("Auth state user:", currentUser.uid);
+    } else {
+      try {
+        const result = await signInAnonymously(auth);
+        setUser(result.user);
+        console.log("Signed in anonymously:", result.user.uid);
+      } catch (error) {
+        console.error("Auth error:", error);
+      }
+    }
+  });
+
+  return () => unsubscribe();
+}, []);
+
+useEffect(() => {
+  const q = query(collection(db, "pledges"), orderBy("createdAt", "desc"));
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
+      console.log("Firestore snapshot size:", snapshot.size);
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setPledges(data);
+    },
+    (error) => {
+      console.error("Firestore read error:", error);
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -77,32 +126,45 @@ useEffect(() => {
 const addPledge = async (event) => {
   event.preventDefault();
 
-  if (!form.name || !form.crop || !form.neighborhood) return;
+  if (!form.name || !form.crop || !form.neighborhood) {
+    console.log("Missing required fields");
+    return;
+  }
 
-const newPledge = {
-  ...form,
-  createdAt: serverTimestamp(),
+  if (!user) {
+    console.log("No user yet");
+    return;
+  }
+
+  try {
+    const newPledge = {
+      ...form,
+      createdAt: serverTimestamp(),
+      userId: user.uid,
+    };
+
+    await addDoc(collection(db, "pledges"), newPledge);
+
+    console.log("Pledge added successfully");
+
+    setForm({
+      name: "",
+      neighborhood: "",
+      crop: "",
+      space: "",
+      harvest: "",
+      shareType: "Can share extras",
+      notes: "",
+    });
+  } catch (error) {
+    console.error("Add pledge error:", error);
+  }
 };
 
-  const docRef = await addDoc(collection(db, "pledges"), newPledge);
-
-  setPledges((prev) => [{ id: docRef.id, ...newPledge }, ...prev]);
-
-  setForm({
-    name: "",
-    neighborhood: "",
-    crop: "",
-    space: "",
-    harvest: "",
-    shareType: "Can share extras",
-    notes: "",
-  });
-};
-
-const deletePledge = async (id) => {
-  await deleteDoc(doc(db, "pledges", id));
-  setPledges((prev) => prev.filter((pledge) => pledge.id !== id));
-};
+  const deletePledge = async (id) => {
+    await deleteDoc(doc(db, "pledges", id));
+    setPledges((prev) => prev.filter((pledge) => pledge.id !== id));
+  };
 
   return (
     <main className="app">
@@ -184,6 +246,9 @@ const deletePledge = async (id) => {
               <p className="eyebrow">Community Crop Board</p>
               <h3>Harvest Shares</h3>
             </div>
+            <p className="auth-status">
+              {user ? `Grower ID: ${user.uid.slice(0, 8)}...` : "Signing in..."}
+            </p>
             <span>{pledges.length} pledge(s)</span>
           </div>
 
@@ -192,7 +257,9 @@ const deletePledge = async (id) => {
               <article className="pledge-card" key={pledge.id}>
                 <div className="card-top">
                   <span className="crop-icon">🌿</span>
-                  <button onClick={() => deletePledge(pledge.id)}>×</button>
+{user && (!pledge.userId || pledge.userId === user.uid) && (
+  <button onClick={() => deletePledge(pledge.id)}>×</button>
+)}
                 </div>
 
                 <h4>{pledge.crop}</h4>
