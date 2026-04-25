@@ -10,25 +10,12 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 
 import { db } from "./firebase";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { auth } from "./firebase";
-
-const starterPledges = [
-  {
-    id: crypto.randomUUID(),
-    name: "Rick",
-    neighborhood: "Van Nuys",
-    crop: "Dragon fruit",
-    space: "Balcony / patio",
-    harvest: "Late summer",
-    shareType: "Can share extras",
-    notes: "Looking for pollination buddies and fruit swaps.",
-    createdAt: new Date().toISOString(),
-  },
-];
 
 const formatDate = (ts) => {
   if (!ts) return "Posting…";
@@ -43,8 +30,9 @@ const formatDate = (ts) => {
 
 function App() {
   const [pledges, setPledges] = useState([]);
-
   const [user, setUser] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   const [form, setForm] = useState({
     name: "",
@@ -56,114 +44,102 @@ function App() {
     notes: "",
   });
 
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    if (currentUser) {
-      setUser(currentUser);
-      console.log("Auth state user:", currentUser.uid);
-    } else {
-      try {
-        const result = await signInAnonymously(auth);
-        setUser(result.user);
-        console.log("Signed in anonymously:", result.user.uid);
-      } catch (error) {
-        console.error("Auth error:", error);
+  // 🔐 AUTH
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        try {
+          const result = await signInAnonymously(auth);
+          setUser(result.user);
+        } catch (error) {
+          console.error("Auth error:", error);
+        }
       }
-    }
-  });
+    });
 
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
 
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    if (currentUser) {
-      setUser(currentUser);
-      console.log("Auth state user:", currentUser.uid);
-    } else {
-      try {
-        const result = await signInAnonymously(auth);
-        setUser(result.user);
-        console.log("Signed in anonymously:", result.user.uid);
-      } catch (error) {
-        console.error("Auth error:", error);
-      }
-    }
-  });
+  // 🔄 FIRESTORE
+  useEffect(() => {
+    const q = query(collection(db, "pledges"), orderBy("createdAt", "desc"));
 
-  return () => unsubscribe();
-}, []);
-
-useEffect(() => {
-  const q = query(collection(db, "pledges"), orderBy("createdAt", "desc"));
-
-  const unsubscribe = onSnapshot(
-    q,
-    (snapshot) => {
-      console.log("Firestore snapshot size:", snapshot.size);
-
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
       setPledges(data);
-    },
-    (error) => {
-      console.error("Firestore read error:", error);
-    }
-  );
+    });
 
-  return () => unsubscribe();
-}, []);
+    return () => unsubscribe();
+  }, []);
 
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+  // ✏️ EDIT
+  const startEdit = (pledge) => {
+    setEditingId(pledge.id);
+    setEditForm({
+      name: pledge.name,
+      neighborhood: pledge.neighborhood,
+      crop: pledge.crop,
+      space: pledge.space,
+      harvest: pledge.harvest,
+      shareType: pledge.shareType,
+      notes: pledge.notes,
+    });
   };
 
-const addPledge = async (event) => {
-  event.preventDefault();
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
 
-  if (!form.name || !form.crop || !form.neighborhood) {
-    console.log("Missing required fields");
-    return;
-  }
+  const saveEdit = async (id) => {
+    try {
+      await updateDoc(doc(db, "pledges", id), {
+        ...editForm,
+      });
+      setEditingId(null);
+      setEditForm({});
+    } catch (error) {
+      console.error("Update error:", error);
+    }
+  };
 
-  if (!user) {
-    console.log("No user yet");
-    return;
-  }
+  // ➕ CREATE
+  const addPledge = async (event) => {
+    event.preventDefault();
 
-  try {
-    const newPledge = {
-      ...form,
-      createdAt: serverTimestamp(),
-      userId: user.uid,
-    };
+    if (!form.name || !form.crop || !form.neighborhood) return;
+    if (!user) return;
 
-    await addDoc(collection(db, "pledges"), newPledge);
+    try {
+      await addDoc(collection(db, "pledges"), {
+        ...form,
+        createdAt: serverTimestamp(),
+        userId: user.uid,
+      });
 
-    console.log("Pledge added successfully");
+      setForm({
+        name: "",
+        neighborhood: "",
+        crop: "",
+        space: "",
+        harvest: "",
+        shareType: "Can share extras",
+        notes: "",
+      });
+    } catch (error) {
+      console.error("Add pledge error:", error);
+    }
+  };
 
-    setForm({
-      name: "",
-      neighborhood: "",
-      crop: "",
-      space: "",
-      harvest: "",
-      shareType: "Can share extras",
-      notes: "",
-    });
-  } catch (error) {
-    console.error("Add pledge error:", error);
-  }
-};
-
+  // ❌ DELETE
   const deletePledge = async (id) => {
     await deleteDoc(doc(db, "pledges", id));
-    setPledges((prev) => prev.filter((pledge) => pledge.id !== id));
   };
 
   return (
@@ -186,24 +162,36 @@ const addPledge = async (event) => {
             name="name"
             placeholder="Your name"
             value={form.name}
-            onChange={handleChange}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, name: e.target.value }))
+            }
           />
 
           <input
             name="neighborhood"
             placeholder="Neighborhood / block"
             value={form.neighborhood}
-            onChange={handleChange}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, neighborhood: e.target.value }))
+            }
           />
 
           <input
             name="crop"
             placeholder="What are you growing?"
             value={form.crop}
-            onChange={handleChange}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, crop: e.target.value }))
+            }
           />
 
-          <select name="space" value={form.space} onChange={handleChange}>
+          <select
+            name="space"
+            value={form.space}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, space: e.target.value }))
+            }
+          >
             <option value="">Growing space type</option>
             <option>Balcony / patio</option>
             <option>Front yard</option>
@@ -216,13 +204,17 @@ const addPledge = async (event) => {
             name="harvest"
             placeholder="Estimated harvest time"
             value={form.harvest}
-            onChange={handleChange}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, harvest: e.target.value }))
+            }
           />
 
           <select
             name="shareType"
             value={form.shareType}
-            onChange={handleChange}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, shareType: e.target.value }))
+            }
           >
             <option>Can share extras</option>
             <option>Wants to trade</option>
@@ -234,7 +226,9 @@ const addPledge = async (event) => {
             name="notes"
             placeholder="Notes, swaps, needs, or fruitbat facts..."
             value={form.notes}
-            onChange={handleChange}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, notes: e.target.value }))
+            }
           />
 
           <button type="submit">Plant the Pledge</button>
@@ -242,39 +236,73 @@ const addPledge = async (event) => {
 
         <section className="board">
           <div className="board-header">
-            <div>
-              <p className="eyebrow">Community Crop Board</p>
-              <h3>Harvest Shares</h3>
-            </div>
+            <h3>Harvest Shares</h3>
             <p className="auth-status">
-              {user ? `Grower ID: ${user.uid.slice(0, 8)}...` : "Signing in..."}
+              {user
+                ? `Grower ID: ${user.uid.slice(0, 8)}...`
+                : "Signing in..."}
             </p>
-            <span>{pledges.length} pledge(s)</span>
           </div>
 
           <div className="pledge-grid">
             {pledges.map((pledge) => (
               <article className="pledge-card" key={pledge.id}>
                 <div className="card-top">
-                  <span className="crop-icon">🌿</span>
-{user && (!pledge.userId || pledge.userId === user.uid) && (
-  <button onClick={() => deletePledge(pledge.id)}>×</button>
-)}
+                  <span>🌿</span>
+
+                  {user &&
+                    (!pledge.userId || pledge.userId === user.uid) && (
+                      <>
+                        <button onClick={() => startEdit(pledge)}>✏️</button>
+                        <button onClick={() => deletePledge(pledge.id)}>
+                          ×
+                        </button>
+                      </>
+                    )}
                 </div>
 
-                <h4>{pledge.crop}</h4>
-                <p className="location">
-                  {pledge.name} · {pledge.neighborhood}
-                </p>
+                {editingId === pledge.id ? (
+                  <>
+                    <div className="edit-inline">
+                      <input
+                        name="crop"
+                        value={editForm.crop || ""}
+                        onChange={handleEditChange}
+                        placeholder="Crop"
+                      />
 
-                <p className="timestamp">
-                  Posted {formatDate(pledge.createdAt)}
-                </p>
+                      <input
+                        name="neighborhood"
+                        value={editForm.neighborhood || ""}
+                        onChange={handleEditChange}
+                        placeholder="Neighborhood"
+                      />
+                    </div>
+
+                    <div className="edit-actions">
+                      <button type="button" onClick={() => saveEdit(pledge.id)}>
+                        Save
+                      </button>
+                      <button type="button" onClick={() => setEditingId(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h4>{pledge.crop}</h4>
+                    <p>
+                      {pledge.name} · {pledge.neighborhood}
+                    </p>
+                  </>
+                )}
+
+                <p>Posted {formatDate(pledge.createdAt)}</p>
 
                 <div className="tags">
                   {pledge.space && <span>{pledge.space}</span>}
                   {pledge.harvest && <span>{pledge.harvest}</span>}
-                  <span>{pledge.shareType}</span>
+                  {pledge.shareType && <span>{pledge.shareType}</span>}
                 </div>
 
                 {pledge.notes && <p className="notes">{pledge.notes}</p>}
