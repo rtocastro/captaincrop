@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import { db } from "./firebase";
+
 const starterPledges = [
   {
     id: crypto.randomUUID(),
@@ -43,42 +46,54 @@ function App() {
     notes: "",
   });
 
-  useEffect(() => {
-    localStorage.setItem("powerplant-pledges", JSON.stringify(pledges));
-  }, [pledges]);
+useEffect(() => {
+  const q = query(collection(db, "pledges"), orderBy("createdAt", "desc"));
+
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setPledges(data);
+  });
+
+  return () => unsubscribe(); // cleanup
+}, []);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addPledge = (event) => {
-    event.preventDefault();
+const addPledge = async (event) => {
+  event.preventDefault();
 
-    if (!form.name || !form.crop || !form.neighborhood) return;
+  if (!form.name || !form.crop || !form.neighborhood) return;
 
-    const newPledge = {
-      id: crypto.randomUUID(),
-      ...form,
-      createdAt: new Date().toISOString(),
-    };
-
-    setPledges((prev) => [newPledge, ...prev]);
-
-    setForm({
-      name: "",
-      neighborhood: "",
-      crop: "",
-      space: "",
-      harvest: "",
-      shareType: "Can share extras",
-      notes: "",
-    });
+  const newPledge = {
+    ...form,
+    createdAt: new Date().toISOString(),
   };
 
-  const deletePledge = (id) => {
-    setPledges((prev) => prev.filter((pledge) => pledge.id !== id));
-  };
+  const docRef = await addDoc(collection(db, "pledges"), newPledge);
+
+  setPledges((prev) => [{ id: docRef.id, ...newPledge }, ...prev]);
+
+  setForm({
+    name: "",
+    neighborhood: "",
+    crop: "",
+    space: "",
+    harvest: "",
+    shareType: "Can share extras",
+    notes: "",
+  });
+};
+
+const deletePledge = async (id) => {
+  await deleteDoc(doc(db, "pledges", id));
+  setPledges((prev) => prev.filter((pledge) => pledge.id !== id));
+};
 
   return (
     <main className="app">
