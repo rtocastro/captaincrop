@@ -35,15 +35,15 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
-  const [form, setForm] = useState({
-    name: "",
-    neighborhood: "",
-    crop: "",
-    space: "",
-    harvest: "",
-    shareType: "Can share extras",
-    notes: "",
-  });
+const [form, setForm] = useState({
+  name: "",
+  zip: "",
+  crop: "",
+  space: "",
+  harvest: "",
+  shareType: "Can share extras",
+  notes: "",
+});
 
   // 🔐 AUTH
   useEffect(() => {
@@ -82,15 +82,15 @@ function App() {
   // ✏️ EDIT
   const startEdit = (pledge) => {
     setEditingId(pledge.id);
-    setEditForm({
-      name: pledge.name,
-      neighborhood: pledge.neighborhood,
-      crop: pledge.crop,
-      space: pledge.space,
-      harvest: pledge.harvest,
-      shareType: pledge.shareType,
-      notes: pledge.notes,
-    });
+setEditForm({
+  name: pledge.name || "",
+  neighborhood: pledge.neighborhood || "",
+  crop: pledge.crop || "",
+  space: pledge.space || "",
+  harvest: pledge.harvest || "",
+  shareType: pledge.shareType || "",
+  notes: pledge.notes || "",
+});
   };
 
   const handleEditChange = (e) => {
@@ -114,7 +114,7 @@ function App() {
   const addPledge = async (event) => {
     event.preventDefault();
 
-    if (!form.name || !form.crop || !form.neighborhood) return;
+    if (!form.name || !form.crop || !form.zip) return;
     if (!user) return;
 
     try {
@@ -126,7 +126,7 @@ function App() {
 
       setForm({
         name: "",
-        neighborhood: "",
+        zip: "",
         crop: "",
         space: "",
         harvest: "",
@@ -169,11 +169,11 @@ function App() {
           />
 
           <input
-            name="neighborhood"
-            placeholder="Neighborhood / block"
-            value={form.neighborhood}
+            name="zip"
+            placeholder="ZIP code"
+            value={form.zip || ""}
             onChange={(e) =>
-              setForm((prev) => ({ ...prev, neighborhood: e.target.value }))
+              setForm((prev) => ({ ...prev, zip: e.target.value }))
             }
           />
 
@@ -275,10 +275,10 @@ function App() {
                       />
 
                       <input
-                        name="neighborhood"
-                        value={editForm.neighborhood || ""}
+                        name="zip"
+                        value={editForm.zip || ""}
                         onChange={handleEditChange}
-                        placeholder="Neighborhood"
+                        placeholder="ZIP Code"
                       />
                     </div>
 
@@ -295,7 +295,7 @@ function App() {
                   <>
                     <h4>{pledge.crop}</h4>
                     <p>
-                      {pledge.name} · {pledge.neighborhood}
+                      {pledge.name} · ZIP {pledge.zip}
                     </p>
                   </>
                 )}

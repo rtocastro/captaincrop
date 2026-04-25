@@ -1,4 +1,5 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { zipCoords, addPrivacyJitter } from "./zipCoords";
 
 export default function MapView({ pledges }) {
   return (
@@ -7,7 +8,7 @@ export default function MapView({ pledges }) {
 
       <MapContainer
         center={[34.2, -118.45]}
-        zoom={12}
+        zoom={11}
         style={{ height: "320px", width: "100%", borderRadius: "22px" }}
       >
         <TileLayer
@@ -15,15 +16,29 @@ export default function MapView({ pledges }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {pledges.map((pledge) => (
-          <Marker key={pledge.id} position={[34.2, -118.45]}>
-            <Popup>
-              <strong>{pledge.crop}</strong>
-              <br />
-              {pledge.name} · {pledge.neighborhood}
-            </Popup>
-          </Marker>
-        ))}
+        {pledges.map((pledge) => {
+          const zip = String(pledge.zip || "").trim();
+          const baseCoords = zipCoords[zip];
+
+          if (!baseCoords) {
+            console.warn("ZIP not supported yet:", zip);
+            return null;
+          }
+
+          const position = addPrivacyJitter(baseCoords[0], baseCoords[1]);
+
+          return (
+            <Marker key={pledge.id} position={position}>
+              <Popup>
+                <strong>{pledge.crop}</strong>
+                <br />
+                {pledge.name}
+                <br />
+                ZIP {zip}
+              </Popup>
+            </Marker>
+          );
+        })}
       </MapContainer>
     </section>
   );
