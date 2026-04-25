@@ -1,42 +1,256 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+:root {
+  --watermelon: #ff5a7a;
+  --leaf: #2e7d32;
+  --mint: #b8f2c2;
+  --soil: #8b5e3c;
+  --cream: #fff7e6;
+  --plum: #3a2338;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(255, 90, 122, 0.25), transparent 28rem),
+    linear-gradient(135deg, var(--cream), #fffdf7);
+  color: var(--plum);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
   padding: 2rem;
+}
+
+.hero {
+  max-width: 980px;
+  margin: 0 auto 2rem;
+  padding: 3rem 2rem;
+  border: 3px solid var(--soil);
+  border-radius: 32px;
+  background: var(--mint);
+  box-shadow: 12px 12px 0 var(--soil);
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--leaf);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+h1 {
+  margin: 0;
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 0.9;
+}
+
+h2 {
+  margin: 0.5rem 0 1rem;
+  color: var(--watermelon);
+  font-size: clamp(1.75rem, 4vw, 3rem);
+}
+
+.hero-copy {
+  max-width: 680px;
+  margin: 0 auto;
+  color: #51384e;
+  font-size: 1.1rem;
+}
+
+.dashboard {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.pledge-form,
+.board {
+  border: 2px solid var(--soil);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 8px 8px 0 rgba(139, 94, 60, 0.35);
+}
+
+.pledge-form {
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.85rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.pledge-form h3,
+.board h3 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 2px solid rgba(139, 94, 60, 0.35);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  color: var(--plum);
+  background: var(--cream);
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid rgba(255, 90, 122, 0.3);
+  border-color: var(--watermelon);
+}
+
+.pledge-form button {
+  border: 0;
+  border-radius: 999px;
+  padding: 1rem;
+  background: var(--watermelon);
+  color: var(--white);
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #c93355;
+}
+
+.pledge-form button:hover {
+  transform: translateY(-2px);
+}
+
+.board {
+  padding: 1.25rem;
+}
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.board-header span {
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  background: var(--plum);
+  color: white;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pledge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.pledge-card {
+  min-height: 230px;
+  padding: 1rem;
+  border: 2px solid rgba(139, 94, 60, 0.38);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff, #fff7e6);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crop-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--mint);
+  font-size: 1.35rem;
+}
+
+.card-top button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 90, 122, 0.16);
+  color: var(--watermelon);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.pledge-card h4 {
+  margin: 1rem 0 0.25rem;
+  font-size: 1.45rem;
+}
+
+.location {
+  margin: 0 0 1rem;
+  color: var(--soil);
+  font-weight: 700;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.tags span {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--leaf);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.notes {
+  margin: 0;
+  color: #4e3b4b;
+  line-height: 1.5;
+}
+
+@media (max-width: 820px) {
+  .app {
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .dashboard {
+    grid-template-columns: 1fr;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .pledge-form {
+    position: static;
   }
-}
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+  .hero {
+    padding: 2rem 1rem;
+    box-shadow: 7px 7px 0 var(--soil);
+  }
 }
