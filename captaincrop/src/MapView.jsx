@@ -20,11 +20,15 @@ export default function MapView({ pledges }) {
           const zip = String(pledge.zip || "").trim();
           const baseCoords = zipCoords[zip];
 
-          if (!baseCoords) {
-            console.warn("ZIP not supported yet:", zip);
-            return null;
-          }
-
+if (!baseCoords) {
+  return (
+    <Marker key={pledge.id} position={[34.2, -118.45]}>
+      <Popup>
+        ZIP not supported yet: {zip}
+      </Popup>
+    </Marker>
+  );
+}
           const position = addPrivacyJitter(baseCoords[0], baseCoords[1]);
 
           return (

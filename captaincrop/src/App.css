@@ -319,4 +319,20 @@ textarea:focus {
   margin: 0 0 1rem;
 }
 
+.tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.tags span {
+  background: #dff3e3;
+  color: #2e7d32;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 }
