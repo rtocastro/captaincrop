@@ -11,8 +11,21 @@ const starterPledges = [
     harvest: "Late summer",
     shareType: "Can share extras",
     notes: "Looking for pollination buddies and fruit swaps.",
+    createdAt: new Date().toISOString(),
   },
 ];
+
+const formatDate = (dateString) => {
+  if (!dateString) return "Date unknown";
+
+  return new Date(dateString).toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
 
 function App() {
   const [pledges, setPledges] = useState(() => {
@@ -47,6 +60,7 @@ function App() {
     const newPledge = {
       id: crypto.randomUUID(),
       ...form,
+      createdAt: new Date().toISOString(),
     };
 
     setPledges((prev) => [newPledge, ...prev]);
@@ -160,6 +174,10 @@ function App() {
                 <h4>{pledge.crop}</h4>
                 <p className="location">
                   {pledge.name} · {pledge.neighborhood}
+                </p>
+
+                <p className="timestamp">
+                  Posted {formatDate(pledge.createdAt)}
                 </p>
 
                 <div className="tags">
