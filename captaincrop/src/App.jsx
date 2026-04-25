@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  addDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+} from "firebase/firestore";
+
 import { db } from "./firebase";
 
 const starterPledges = [
@@ -18,13 +28,12 @@ const starterPledges = [
   },
 ];
 
-const formatDate = (dateString) => {
-  if (!dateString) return "Date unknown";
-
-  return new Date(dateString).toLocaleString([], {
+const formatDate = (ts) => {
+  if (!ts) return "Posting…";
+  const date = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+  return date.toLocaleString([], {
     month: "short",
     day: "numeric",
-    year: "numeric",
     hour: "numeric",
     minute: "2-digit",
   });
@@ -70,10 +79,10 @@ const addPledge = async (event) => {
 
   if (!form.name || !form.crop || !form.neighborhood) return;
 
-  const newPledge = {
-    ...form,
-    createdAt: new Date().toISOString(),
-  };
+const newPledge = {
+  ...form,
+  createdAt: serverTimestamp(),
+};
 
   const docRef = await addDoc(collection(db, "pledges"), newPledge);
 
