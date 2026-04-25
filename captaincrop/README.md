@@ -1,16 +1,102 @@
-# React + Vite
+# 🌱 CaptainCrop 🍉
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Status](https://img.shields.io/badge/status-active%20prototype-ff5a7a)
+![Built With](https://img.shields.io/badge/built%20with-React%20%2B%20Vite-2e7d32)
+![Vibe](https://img.shields.io/badge/vibe-whimsical%20%26%20community-b8f2c2)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**CaptainCrop** is a whimsical community crop-sharing planner that helps neighbors organize what they’re growing, share harvests, and build local food ecosystems.
 
-## React Compiler
+Built as part of **The Fruitbat Org 🦇**, this project focuses on making community gardening simple, fun, and collaborative.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🍉 What is this?
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+CaptainCrop lets people:
+
+* 🌿 Declare what they’re growing (**Grow Pledges**)
+* 📍 Tag their neighborhood or block
+* 🍅 Share or trade harvests
+* 🤝 Connect with nearby growers
+* 🌱 Build a decentralized, community-driven food network
+
+> *“What if neighborhoods coordinated food growing like a shared system?”*
+
+---
+
+## ✨ Features (Current Prototype)
+
+* Add a Grow Pledge form
+* View all community pledges
+* Delete pledges
+* Local storage persistence
+* Mobile-friendly layout
+* Watermelon 🍉 + leafy 🌿 themed UI
+
+---
+
+## 🛠 Tech Stack
+
+* ⚛️ React (Vite)
+* 🎨 Custom CSS
+* 💾 LocalStorage
+
+---
+
+## 🚀 Getting Started
+
+```bash
+git clone https://github.com/rtocastro/captaincrop.git
+cd captaincrop/captaincrop
+npm install
+npm run dev
+```
+
+---
+
+## 🌱 Roadmap
+
+* 🔐 Authentication
+* 🗺 Map-based neighborhood view
+* 🔄 Trade / swap system
+* 📅 Harvest timeline tracking
+* 🔔 Notifications
+* ☁️ Firebase or Supabase backend
+* 🦇 Fruitbat-themed UI enhancements
+
+---
+
+## 🧠 Inspiration
+
+Inspired by real-world community farming systems where neighbors coordinate crops and share food locally.
+
+Also powered by:
+
+* 🌱 Growing your own food
+* 🤝 Community resilience
+* 🍉 Slightly chaotic wholesome energy
+
+---
+
+## 🦇 About The Fruitbat Org
+
+The Fruitbat Org focuses on:
+
+* 🌱 Community gardening
+* 🍎 Food accessibility
+* 🤝 Local collaboration
+* 📦 Free tools & resources
+
+---
+
+## 📌 Status
+
+🚧 Early prototype — actively being developed
+
+---
+
+## ❤️ Final Note
+
+> grow a little, share a little, help a lot 🌱
