@@ -147,15 +147,15 @@ setEditForm({
     <main className="app">
       <section className="hero">
         <p className="eyebrow">The Fruitbat Org presents</p>
-        <h1>PowerPlant</h1>
-        <h2>Lettuce Share 🍉</h2>
+        <h1>Captain Crop</h1>
+        <h2>Let us plant! Lettuce Share 🍉</h2>
         <p className="hero-copy">
           A neighborhood crop board for people growing food, sharing harvests,
           trading extras, and building community one tiny green thing at a time.
         </p>
       </section>
 
-      <section className="dashboard">
+      <div><section className="dashboard">
         <form className="pledge-form" onSubmit={addPledge}>
           <h3>Add a Grow Pledge 🌱</h3>
 
@@ -235,7 +235,8 @@ setEditForm({
           <button type="submit">Plant the Pledge</button>
         </form>
 
-        <MapView pledges={pledges} />
+    <div className="content-column">
+    <MapView pledges={pledges} /></div>
 
         <section className="board">
           <div className="board-header">
@@ -314,6 +315,7 @@ setEditForm({
           </div>
         </section>
       </section>
+      </div>
     </main>
   );
 }
