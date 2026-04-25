@@ -306,4 +306,17 @@ textarea:focus {
   color: var(--plum);
 }
 
+.map-card {
+  border: 2px solid var(--soil);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 8px 8px 0 rgba(139, 94, 60, 0.35);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.map-card h3 {
+  margin: 0 0 1rem;
+}
+
 }

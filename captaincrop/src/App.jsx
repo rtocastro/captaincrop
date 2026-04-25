@@ -16,6 +16,7 @@ import {
 import { db } from "./firebase";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { auth } from "./firebase";
+import MapView from "./MapView";
 
 const formatDate = (ts) => {
   if (!ts) return "Posting…";
@@ -233,6 +234,8 @@ function App() {
 
           <button type="submit">Plant the Pledge</button>
         </form>
+
+        <MapView pledges={pledges} />
 
         <section className="board">
           <div className="board-header">
