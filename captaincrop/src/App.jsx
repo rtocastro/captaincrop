@@ -45,7 +45,11 @@ function App() {
     notes: "",
   });
 
-  
+  const [filters, setFilters] = useState({
+    search: "",
+    zip: "",
+    shareType: "",
+  });
 
   // 🔐 AUTH
   useEffect(() => {
@@ -145,6 +149,20 @@ function App() {
     await deleteDoc(doc(db, "pledges", id));
   };
 
+  const filteredPledges = pledges.filter((pledge) => {
+    const matchesSearch =
+      !filters.search ||
+      pledge.crop?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      pledge.notes?.toLowerCase().includes(filters.search.toLowerCase());
+
+    const matchesZip = !filters.zip || pledge.zip === filters.zip;
+
+    const matchesShareType =
+      !filters.shareType || pledge.shareType === filters.shareType;
+
+    return matchesSearch && matchesZip && matchesShareType;
+  });
+
   return (
     <main className="app">
       <section className="hero">
@@ -238,7 +256,49 @@ function App() {
         </form>
 
         <div className="content-column">
-          <MapView pledges={pledges} />
+          <MapView pledges={filteredPledges} />
+
+          <section className="filter-card">
+            <h3>Find Crops 🔍</h3>
+
+            <div className="filters">
+              <input
+                placeholder="Search crop or notes"
+                value={filters.search}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, search: e.target.value }))
+                }
+              />
+
+              <input
+                placeholder="Filter by ZIP"
+                value={filters.zip}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, zip: e.target.value }))
+                }
+              />
+
+              <select
+                value={filters.shareType}
+                onChange={(e) =>
+                  setFilters((prev) => ({ ...prev, shareType: e.target.value }))
+                }
+              >
+                <option value="">All share types</option>
+                <option>Can share extras</option>
+                <option>Wants to trade</option>
+                <option>Needs help growing</option>
+                <option>Just learning</option>
+              </select>
+
+              <button
+                type="button"
+                onClick={() => setFilters({ search: "", zip: "", shareType: "" })}
+              >
+                Clear
+              </button>
+            </div>
+          </section>
 
           <section className="board">
             <div className="board-header">
@@ -251,7 +311,7 @@ function App() {
             </div>
 
             <div className="pledge-grid">
-              {pledges.map((pledge) => (
+              {filteredPledges.map((pledge) => (
                 <article className="pledge-card" key={pledge.id}>
                   <div className="card-top">
                     <span>🌿</span>

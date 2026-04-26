@@ -315,6 +315,35 @@ textarea:focus {
   color: var(--plum);
 }
 
+.filter-card {
+  border: 2px solid var(--soil);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 8px 8px 0 rgba(139, 94, 60, 0.35);
+  padding: 1.25rem;
+}
+
+.filter-card h3 {
+  margin: 0 0 1rem;
+  font-size: 1.6rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 1fr 160px 190px auto;
+  gap: 0.75rem;
+}
+
+.filters button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.85rem 1rem;
+  background: rgba(58, 35, 56, 0.12);
+  color: var(--plum);
+  font-weight: 900;
+  cursor: pointer;
+}
+
 /* Mobile */
 @media (max-width: 820px) {
   .app {
@@ -337,4 +366,9 @@ textarea:focus {
   .leaflet-container {
     height: 320px !important;
   }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
 }
