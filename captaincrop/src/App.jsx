@@ -374,7 +374,7 @@ function App() {
                 <option>Needs help growing</option>
                 <option>Just learning</option>
               </select>
-<br />
+              <br />
 
               <button
                 type="button"
@@ -511,7 +511,13 @@ function App() {
         </div>
       </section>
       {toast && <div className="toast">{toast}</div>}
+      <footer className="footer">
+        ZIP-level locations only • no exact addresses • built by{" "}
+        <a href="mailto:ricktorrescastro@gmail.com">Ricardo Torres</a>
+        {" "}|| The Fruitbat Org 🦇
+      </footer>
     </main>
+
   );
 }
 
