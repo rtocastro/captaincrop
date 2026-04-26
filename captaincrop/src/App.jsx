@@ -51,6 +51,24 @@ function App() {
     shareType: "",
   });
 
+  const handleInterest = async (pledge, type) => {
+  if (!user) return;
+
+  try {
+    await addDoc(collection(db, "interests"), {
+      pledgeId: pledge.id,
+      userId: user.uid,
+      zip: pledge.zip || "",
+      type,
+      createdAt: serverTimestamp(),
+    });
+
+    console.log("Interest saved");
+  } catch (error) {
+    console.error("Interest error:", error);
+  }
+};
+
   // 🔐 AUTH
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -370,6 +388,26 @@ function App() {
                     </>
                   )}
 
+                  <div className="interest-box">
+  <select
+    defaultValue=""
+    onChange={(e) => {
+      if (e.target.value) {
+        handleInterest(pledge, e.target.value);
+        e.target.value = "";
+      }
+    }}
+  >
+    <option value="" disabled>
+      I’m interested 🌱
+    </option>
+    <option>Trade</option>
+    <option>Help grow</option>
+    <option>Interested in extras</option>
+    <option>Same ZIP grow buddy</option>
+  </select>
+</div>
+
                   <p>Posted {formatDate(pledge.createdAt)}</p>
 
                   <div className="tags">
@@ -377,7 +415,7 @@ function App() {
                     {pledge.harvest && <span>{pledge.harvest}</span>}
                     {pledge.shareType && <span>{pledge.shareType}</span>}
                   </div>
-                  
+
                   {filters.search && <span>🔍 {filters.search}</span>}
                   {filters.zip && <span>📍 {filters.zip}</span>}
                   {filters.shareType && <span>🌿 {filters.shareType}</span>}

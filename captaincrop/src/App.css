@@ -344,6 +344,20 @@ textarea:focus {
   cursor: pointer;
 }
 
+.interest-box {
+  margin-top: 0.75rem;
+}
+
+.interest-box select {
+  width: 100%;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  border: 2px solid rgba(139, 94, 60, 0.35);
+  background: #f0fff3;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 /* Mobile */
 @media (max-width: 820px) {
   .app {
