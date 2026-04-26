@@ -35,15 +35,17 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
-const [form, setForm] = useState({
-  name: "",
-  zip: "",
-  crop: "",
-  space: "",
-  harvest: "",
-  shareType: "Can share extras",
-  notes: "",
-});
+  const [form, setForm] = useState({
+    name: "",
+    zip: "",
+    crop: "",
+    space: "",
+    harvest: "",
+    shareType: "Can share extras",
+    notes: "",
+  });
+
+  
 
   // 🔐 AUTH
   useEffect(() => {
@@ -82,15 +84,15 @@ const [form, setForm] = useState({
   // ✏️ EDIT
   const startEdit = (pledge) => {
     setEditingId(pledge.id);
-setEditForm({
-  name: pledge.name || "",
-  neighborhood: pledge.neighborhood || "",
-  crop: pledge.crop || "",
-  space: pledge.space || "",
-  harvest: pledge.harvest || "",
-  shareType: pledge.shareType || "",
-  notes: pledge.notes || "",
-});
+    setEditForm({
+      name: pledge.name || "",
+      neighborhood: pledge.neighborhood || "",
+      crop: pledge.crop || "",
+      space: pledge.space || "",
+      harvest: pledge.harvest || "",
+      shareType: pledge.shareType || "",
+      notes: pledge.notes || "",
+    });
   };
 
   const handleEditChange = (e) => {
@@ -155,7 +157,7 @@ setEditForm({
         </p>
       </section>
 
-      <div><section className="dashboard">
+      <section className="dashboard">
         <form className="pledge-form" onSubmit={addPledge}>
           <h3>Add a Grow Pledge 🌱</h3>
 
@@ -235,87 +237,87 @@ setEditForm({
           <button type="submit">Plant the Pledge</button>
         </form>
 
-    <div className="content-column">
-    <MapView pledges={pledges} /></div>
+        <div className="content-column">
+          <MapView pledges={pledges} />
 
-        <section className="board">
-          <div className="board-header">
-            <h3>Harvest Shares</h3>
-            <p className="auth-status">
-              {user
-                ? `Grower ID: ${user.uid.slice(0, 8)}...`
-                : "Signing in..."}
-            </p>
-          </div>
+          <section className="board">
+            <div className="board-header">
+              <h3>Harvest Shares</h3>
+              <p className="auth-status">
+                {user
+                  ? `Grower ID: ${user.uid.slice(0, 8)}...`
+                  : "Signing in..."}
+              </p>
+            </div>
 
-          <div className="pledge-grid">
-            {pledges.map((pledge) => (
-              <article className="pledge-card" key={pledge.id}>
-                <div className="card-top">
-                  <span>🌿</span>
+            <div className="pledge-grid">
+              {pledges.map((pledge) => (
+                <article className="pledge-card" key={pledge.id}>
+                  <div className="card-top">
+                    <span>🌿</span>
 
-                  {user &&
-                    (!pledge.userId || pledge.userId === user.uid) && (
-                      <>
-                        <button onClick={() => startEdit(pledge)}>✏️</button>
-                        <button onClick={() => deletePledge(pledge.id)}>
-                          ×
+                    {user &&
+                      (!pledge.userId || pledge.userId === user.uid) && (
+                        <>
+                          <button onClick={() => startEdit(pledge)}>✏️</button>
+                          <button onClick={() => deletePledge(pledge.id)}>
+                            ×
+                          </button>
+                        </>
+                      )}
+                  </div>
+
+                  {editingId === pledge.id ? (
+                    <>
+                      <div className="edit-inline">
+                        <input
+                          name="crop"
+                          value={editForm.crop || ""}
+                          onChange={handleEditChange}
+                          placeholder="Crop"
+                        />
+
+                        <input
+                          name="zip"
+                          value={editForm.zip || ""}
+                          onChange={handleEditChange}
+                          placeholder="ZIP Code"
+                        />
+                      </div>
+
+                      <div className="edit-actions">
+                        <button type="button" onClick={() => saveEdit(pledge.id)}>
+                          Save
                         </button>
-                      </>
-                    )}
-                </div>
+                        <button type="button" onClick={() => setEditingId(null)}>
+                          Cancel
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <h4>{pledge.crop}</h4>
+                      <p>
+                        {pledge.name} · ZIP {pledge.zip}
+                      </p>
+                    </>
+                  )}
 
-                {editingId === pledge.id ? (
-                  <>
-                    <div className="edit-inline">
-                      <input
-                        name="crop"
-                        value={editForm.crop || ""}
-                        onChange={handleEditChange}
-                        placeholder="Crop"
-                      />
+                  <p>Posted {formatDate(pledge.createdAt)}</p>
 
-                      <input
-                        name="zip"
-                        value={editForm.zip || ""}
-                        onChange={handleEditChange}
-                        placeholder="ZIP Code"
-                      />
-                    </div>
+                  <div className="tags">
+                    {pledge.space && <span>{pledge.space}</span>}
+                    {pledge.harvest && <span>{pledge.harvest}</span>}
+                    {pledge.shareType && <span>{pledge.shareType}</span>}
+                  </div>
 
-                    <div className="edit-actions">
-                      <button type="button" onClick={() => saveEdit(pledge.id)}>
-                        Save
-                      </button>
-                      <button type="button" onClick={() => setEditingId(null)}>
-                        Cancel
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h4>{pledge.crop}</h4>
-                    <p>
-                      {pledge.name} · ZIP {pledge.zip}
-                    </p>
-                  </>
-                )}
-
-                <p>Posted {formatDate(pledge.createdAt)}</p>
-
-                <div className="tags">
-                  {pledge.space && <span>{pledge.space}</span>}
-                  {pledge.harvest && <span>{pledge.harvest}</span>}
-                  {pledge.shareType && <span>{pledge.shareType}</span>}
-                </div>
-
-                {pledge.notes && <p className="notes">{pledge.notes}</p>}
-              </article>
-            ))}
-          </div>
-        </section>
+                  {pledge.notes && <p className="notes">{pledge.notes}</p>}
+                </article>
+              ))}
+            </div>
+          </section>
+        </div>
       </section>
-      </div>
     </main>
   );
 }
