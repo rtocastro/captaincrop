@@ -51,8 +51,21 @@ function App() {
     shareType: "",
   });
 
-  const handleInterest = async (pledge, type) => {
-  if (!user) return;
+  const [toast, setToast] = useState("");
+
+  const showToast = (message) => {
+    setToast(message);
+
+    setTimeout(() => {
+      setToast("");
+    }, 2500);
+  };
+
+const handleInterest = async (pledge, type) => {
+  if (!user) {
+    showToast("Still signing in — try again in a second");
+    return;
+  }
 
   try {
     await addDoc(collection(db, "interests"), {
@@ -63,9 +76,10 @@ function App() {
       createdAt: serverTimestamp(),
     });
 
-    console.log("Interest saved");
+    showToast("Interest sent 🌱");
   } catch (error) {
     console.error("Interest error:", error);
+    showToast("Could not send interest");
   }
 };
 
@@ -389,24 +403,24 @@ function App() {
                   )}
 
                   <div className="interest-box">
-  <select
-    defaultValue=""
-    onChange={(e) => {
-      if (e.target.value) {
-        handleInterest(pledge, e.target.value);
-        e.target.value = "";
-      }
-    }}
-  >
-    <option value="" disabled>
-      I’m interested 🌱
-    </option>
-    <option>Trade</option>
-    <option>Help grow</option>
-    <option>Interested in extras</option>
-    <option>Same ZIP grow buddy</option>
-  </select>
-</div>
+                    <select
+                      defaultValue=""
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          handleInterest(pledge, e.target.value);
+                          e.target.value = "";
+                        }
+                      }}
+                    >
+                      <option value="" disabled>
+                        I’m interested 🌱
+                      </option>
+                      <option>Trade</option>
+                      <option>Help grow</option>
+                      <option>Interested in extras</option>
+                      <option>Same ZIP grow buddy</option>
+                    </select>
+                  </div>
 
                   <p>Posted {formatDate(pledge.createdAt)}</p>
 
@@ -421,12 +435,15 @@ function App() {
                   {filters.shareType && <span>🌿 {filters.shareType}</span>}
 
                   {pledge.notes && <p className="notes">{pledge.notes}</p>}
+
+                  
                 </article>
               ))}
             </div>
           </section>
         </div>
       </section>
+      {toast && <div className="toast">{toast}</div>}
     </main>
   );
 }
