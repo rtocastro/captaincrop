@@ -308,7 +308,14 @@ function App() {
                   ? `Grower ID: ${user.uid.slice(0, 8)}...`
                   : "Signing in..."}
               </p>
+              <span>{filteredPledges.length} result(s)</span>
             </div>
+
+            {filteredPledges.length === 0 && (
+              <p style={{ marginTop: "1rem", opacity: 0.7 }}>
+                No matches found 🌱 try adjusting your filters
+              </p>
+            )}
 
             <div className="pledge-grid">
               {filteredPledges.map((pledge) => (
@@ -370,6 +377,10 @@ function App() {
                     {pledge.harvest && <span>{pledge.harvest}</span>}
                     {pledge.shareType && <span>{pledge.shareType}</span>}
                   </div>
+                  
+                  {filters.search && <span>🔍 {filters.search}</span>}
+                  {filters.zip && <span>📍 {filters.zip}</span>}
+                  {filters.shareType && <span>🌿 {filters.shareType}</span>}
 
                   {pledge.notes && <p className="notes">{pledge.notes}</p>}
                 </article>
