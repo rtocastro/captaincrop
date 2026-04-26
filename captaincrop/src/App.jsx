@@ -11,6 +11,9 @@ import {
   doc,
   serverTimestamp,
   updateDoc,
+  getDocs,
+  where,
+  setDoc
 } from "firebase/firestore";
 
 import { db } from "./firebase";
@@ -61,27 +64,61 @@ function App() {
     }, 2500);
   };
 
-const handleInterest = async (pledge, type) => {
-  if (!user) {
-    showToast("Still signing in — try again in a second");
-    return;
-  }
+  const [myInterests, setMyInterests] = useState({});
+  useEffect(() => {
+    if (!user) return;
 
-  try {
-    await addDoc(collection(db, "interests"), {
-      pledgeId: pledge.id,
-      userId: user.uid,
-      zip: pledge.zip || "",
-      type,
-      createdAt: serverTimestamp(),
+    const q = query(collection(db, "interests"), where("userId", "==", user.uid));
+    const unsub = onSnapshot(q, (snap) => {
+      const map = {};
+      snap.forEach((d) => {
+        const data = d.data();
+        map[data.pledgeId] = true;
+      });
+      setMyInterests(map);
     });
 
-    showToast("Interest sent 🌱");
-  } catch (error) {
-    console.error("Interest error:", error);
-    showToast("Could not send interest");
-  }
-};
+    return () => unsub();
+  }, [user]);
+
+
+  const [interestCounts, setInterestCounts] = useState({});
+
+  const handleInterest = async (pledge, type) => {
+    if (!user) {
+      showToast("Still signing in — try again in a second");
+      return;
+    }
+
+    try {
+      const q = query(
+        collection(db, "interests"),
+        where("pledgeId", "==", pledge.id),
+        where("userId", "==", user.uid)
+      );
+
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        showToast("You already expressed interest 🌱");
+        return;
+      }
+
+      const id = `${pledge.id}_${user.uid}`;
+      await setDoc(doc(db, "interests", id), {
+        pledgeId: pledge.id,
+        userId: user.uid,
+        zip: pledge.zip || "",
+        type,
+        createdAt: serverTimestamp(),
+      });
+
+      showToast("Interest sent 🌱");
+    } catch (error) {
+      console.error("Interest error:", error);
+      showToast("Could not send interest");
+    }
+  };
 
   // 🔐 AUTH
   useEffect(() => {
@@ -112,6 +149,21 @@ const handleInterest = async (pledge, type) => {
       }));
 
       setPledges(data);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "interests"), (snapshot) => {
+      const counts = {};
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        counts[data.pledgeId] = (counts[data.pledgeId] || 0) + 1;
+      });
+
+      setInterestCounts(counts);
     });
 
     return () => unsubscribe();
@@ -322,7 +374,14 @@ const handleInterest = async (pledge, type) => {
                 <option>Needs help growing</option>
                 <option>Just learning</option>
               </select>
+<br />
 
+              <button
+                type="button"
+                onClick={() => setFilters((p) => ({ ...p, zip: form.zip || "" }))}
+              >
+                Near me 📍
+              </button>
               <button
                 type="button"
                 onClick={() => setFilters({ search: "", zip: "", shareType: "" })}
@@ -401,26 +460,29 @@ const handleInterest = async (pledge, type) => {
                       </p>
                     </>
                   )}
+                  {myInterests[pledge.id] ? (
+                    <div className="interest-done">Interested ✔</div>
+                  ) : (
+                    <div className="interest-box">
+                      <select
+                        defaultValue=""
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            handleInterest(pledge, e.target.value);
+                            e.target.value = "";
+                          }
+                        }}
+                      >
+                        <option value="" disabled>
+                          I’m interested 🌱
+                        </option>
+                        <option>Trade</option>
+                        <option>Help grow</option>
+                        <option>Interested in extras</option>
+                        <option>Same ZIP grow buddy</option>
+                      </select>
+                    </div>)}
 
-                  <div className="interest-box">
-                    <select
-                      defaultValue=""
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          handleInterest(pledge, e.target.value);
-                          e.target.value = "";
-                        }
-                      }}
-                    >
-                      <option value="" disabled>
-                        I’m interested 🌱
-                      </option>
-                      <option>Trade</option>
-                      <option>Help grow</option>
-                      <option>Interested in extras</option>
-                      <option>Same ZIP grow buddy</option>
-                    </select>
-                  </div>
 
                   <p>Posted {formatDate(pledge.createdAt)}</p>
 
@@ -429,6 +491,11 @@ const handleInterest = async (pledge, type) => {
                     {pledge.harvest && <span>{pledge.harvest}</span>}
                     {pledge.shareType && <span>{pledge.shareType}</span>}
                   </div>
+                  {interestCounts[pledge.id] > 0 && (
+                    <p className="interest-count">
+                      🌱 {interestCounts[pledge.id]} interested
+                    </p>
+                  )}
 
                   {filters.search && <span>🔍 {filters.search}</span>}
                   {filters.zip && <span>📍 {filters.zip}</span>}
@@ -436,7 +503,7 @@ const handleInterest = async (pledge, type) => {
 
                   {pledge.notes && <p className="notes">{pledge.notes}</p>}
 
-                  
+
                 </article>
               ))}
             </div>

@@ -372,6 +372,22 @@ textarea:focus {
   animation: toast-pop 0.2s ease-out;
 }
 
+.interest-count {
+  margin: 0.5rem 0;
+  font-weight: 800;
+  color: var(--leaf);
+}
+
+.interest-done {
+  margin-top: 0.6rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: #e8f7ec;
+  color: var(--leaf);
+  font-weight: 800;
+  text-align: center;
+}
+
 @keyframes toast-pop {
   from {
     opacity: 0;
@@ -382,6 +398,9 @@ textarea:focus {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
+  
+  
 }
 
 /* Mobile */
