@@ -251,7 +251,11 @@ function App() {
     <main className="app">
       <section className="hero">
         <p className="eyebrow">The Fruitbat Org presents</p>
-        <h1>Captain Crop</h1>
+        <img
+          src="/src/assets/logo.png"
+          alt="PowerPlant"
+          className="hero-logo"
+        />
         <h2>Let us plant! Lettuce Share 🍉</h2>
         <p className="hero-copy">
           A neighborhood crop board for people growing food, sharing harvests,

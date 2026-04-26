@@ -395,6 +395,14 @@ textarea:focus {
   font-size: 0.85rem;
 }
 
+.hero-logo {
+  max-width: 420px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
 @keyframes toast-pop {
   from {
     opacity: 0;
@@ -406,8 +414,8 @@ textarea:focus {
     transform: translateY(0) scale(1);
   }
 
-  
-  
+
+
 }
 
 /* Mobile */
@@ -445,10 +453,16 @@ textarea:focus {
   }
 
   .footer a {
-  color: var(--plum);
-  font-weight: 800;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+    color: var(--plum);
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+
+  .hero-logo {
+    max-width: 280px;
+  }
+
 
 }
