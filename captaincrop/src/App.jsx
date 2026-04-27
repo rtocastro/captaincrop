@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import captainCropLogo from "./assets/logo.png";
 
 import {
   collection,
@@ -252,8 +253,8 @@ function App() {
       <section className="hero">
         <p className="eyebrow">The Fruitbat Org presents</p>
         <img
-          src="/src/assets/logo.png"
-          alt="PowerPlant"
+          src={captainCropLogo}
+          alt="Captain Crop"
           className="hero-logo"
         />
         <h2>Let us plant! Lettuce Share 🍉</h2>
