@@ -403,6 +403,19 @@ textarea:focus {
   display: block;
 }
 
+.emoji-marker {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--cream);
+  border: 2px solid var(--soil);
+  box-shadow: 0 4px 10px rgba(58, 35, 56, 0.25);
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
 @keyframes toast-pop {
   from {
     opacity: 0;
