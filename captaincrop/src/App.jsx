@@ -308,6 +308,7 @@ function App() {
             <option>Backyard</option>
             <option>Window / indoor</option>
             <option>Community garden</option>
+            <option>Public / community space</option>
           </select>
 
           <input
