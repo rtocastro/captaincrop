@@ -266,7 +266,7 @@ function App() {
 
       <section className="dashboard">
         <form className="pledge-form" onSubmit={addPledge}>
-          <h3>Add a Grow Pledge 🌱</h3>
+          <h3>Add a Grow Pledge/Harvest 🌱</h3>
 
           <input
             name="name"
